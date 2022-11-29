@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "781090645645",
+    "project_id": "tanam-in",
+    "storage_bucket": "tanam-in.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:781090645645:android:ed157c106abff5e8bb24c4",
+        "android_client_info": {
+          "package_name": "com.example.tanamin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "781090645645-otekaprcb6pgpt21hc4knuc3175dfb42.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tanamin",
+            "certificate_hash": "0da10e9eae2967aa46143852215b014f4a164412"
+          }
+        },
+        {
+          "client_id": "781090645645-7el6qfnmtdiihqsav8jk4avc1jlq1qfo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqecyLWinDE8m1mRjXuppjXJCDD2okPKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "781090645645-7el6qfnmtdiihqsav8jk4avc1jlq1qfo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
