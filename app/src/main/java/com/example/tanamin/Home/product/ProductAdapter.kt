@@ -1,5 +1,6 @@
 package com.example.tanamin.Home.product
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +11,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.tanamin.R
 
-class ProductAdapter(val listProduct: ArrayList<Product>, mListener: IUProduct) :
+class ProductAdapter(var listProduct: ArrayList<Product>, mListener: IUProduct) :
     RecyclerView.Adapter<ProductAdapter.GridViewHolder>() {
+
+    var products: ArrayList<Product> = ArrayList()
+        set(value) {
+            listProduct = value
+            notifyDataSetChanged()
+        }
+
     private lateinit var onItemClickCallback: OnItemClickCallback
 
     private var mListener = mListener
@@ -29,14 +37,21 @@ class ProductAdapter(val listProduct: ArrayList<Product>, mListener: IUProduct) 
 
     override fun onBindViewHolder(holder: GridViewHolder, position: Int) {
         val product = listProduct[position]
-        Glide.with(holder.itemView.context)
-            .load(listProduct[position].photo)
-            .apply(RequestOptions())
-            .into(holder.imgPhoto)
-        holder.imgPhoto.setOnClickListener { onItemClickCallback.onItemClicked(listProduct[holder.adapterPosition]) }
-        holder.tvNamaProduk.text = product.nama_product
-        holder.tvHargaProduk.text = product.harga
-        mListener.toDetail(listProduct[position].pid)
+
+        holder.itemView.apply {
+            Glide.with(holder.itemView.context)
+                .load(listProduct[position].photo)
+                .apply(RequestOptions())
+                .into(holder.imgPhoto)
+            holder.imgPhoto.setOnClickListener { onItemClickCallback.onItemClicked(listProduct[holder.adapterPosition]) }
+            holder.tvNamaProduk.text = product.nama_product
+            holder.tvHargaProduk.text = product.harga
+        }.setOnClickListener { mView ->
+            Log.d("onClick ProductAdapter", "toDetail di panggil")
+            mListener.toDetail(listProduct[position].pid)
+
+        }
+
     }
 
     override fun getItemCount(): Int {

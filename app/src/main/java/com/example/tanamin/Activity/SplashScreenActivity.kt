@@ -27,11 +27,13 @@ class SplashScreenActivity : AppCompatActivity() {
         fAuth = FirebaseAuth.getInstance()
         val user = fAuth.currentUser
 
+        @Suppress("DEPRECATION")
         window.setFlags(
             WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
 
+        @Suppress("DEPRECATION")
         Handler().postDelayed({
             if(user != null) {
                 val intent = Intent(this@SplashScreenActivity, HomeActivity::class.java)

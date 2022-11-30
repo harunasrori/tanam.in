@@ -40,7 +40,7 @@ class CarouselAdapter internal constructor(private val listCarousel: ArrayList<C
 
         Glide.with(holder.itemView.context)
             .load(carousel.photo)
-            .apply(RequestOptions().override(350, 550))
+            .apply(RequestOptions().override(1065, 492))
             .into(holder.imgPhoto)
 
         holder.imgPhoto.setOnClickListener {

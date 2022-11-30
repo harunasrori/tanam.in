@@ -54,7 +54,6 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
 //        productViewModel = ViewModelProvider(this).get(ProductViewModel::class.java)
 
 
@@ -104,7 +103,9 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
 
         binding.SearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
+                val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment(p0.toString())
+                findNavController().navigate(action)
+//                findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
                 return false
             }
 
