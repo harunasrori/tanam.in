@@ -15,7 +15,6 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
@@ -23,15 +22,17 @@ import com.example.tanamin.Authentication.AuthenticationActivity
 import com.example.tanamin.Home.carousel.Carousel
 import com.example.tanamin.Home.carousel.CarouselAdapter
 import com.example.tanamin.Home.carousel.carouselData
+import com.example.tanamin.Home.favorite.Favorite
+import com.example.tanamin.Home.favorite.FavoriteAdapter
 import com.example.tanamin.R
 import com.example.tanamin.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.*
 import java.util.*
 
 @Suppress("DEPRECATION")
-class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategori {
+class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategori,
+    FavoriteAdapter.IUProduct {
 
     private lateinit var container: SharedPreferences
 
@@ -46,35 +47,19 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
     private lateinit var db: DocumentReference
 
     private var list_carousel: ArrayList<Carousel> = arrayListOf<Carousel>()
+    private var list_favorite: ArrayList<Favorite> = arrayListOf<Favorite>()
     private lateinit var rvCarousel: RecyclerView
     private lateinit var listCarouselAdapter: CarouselAdapter
+    private lateinit var favoriteAdapter: FavoriteAdapter
 
     private var uid: String = ""
     private var user_name_google: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        productViewModel = ViewModelProvider(this).get(ProductViewModel::class.java)
-
-
-//        productViewModel.getAllProductData(requireContext())!!.observe(this, object : Observer<List<Product>?>(),
-//            androidx.lifecycle.Observer<List<Product>> {
-//
-//            override fun onChanged(t: List<Product>?) {
-//                TODO("Not yet implemented")
-//            }
-//        })
-
-
-        //        context?.let {
-        //            productViewModel.getAllProductData(it)?.observe(this, Observer {
-        //                noteAdapter.setData(it as ArrayList<Product>)
-        //                noteList = it
-        //            })
-        //        }
 
         container = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
-
+        uid = FirebaseAuth.getInstance().currentUser!!.uid
         list_carousel.addAll(carouselData.listData)
     }
 
@@ -92,43 +77,38 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
         rvCarousel = binding.rvCarousel
         rvCarousel.setHasFixedSize(true)
 
-        binding.btnTesRv.setOnClickListener {
-            findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
-//            Toast.makeText(
-//                context,
-//                "Item sekarang adalah ke - ${carousel_layout_manager.findFirstVisibleItemPosition()}",
-//                Toast.LENGTH_SHORT
-//            ).show()
-        }
-
-        binding.SearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+        binding.SearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                val action = HomeFragmentDirections.actionHomeFragmentToSearchFragment(p0.toString())
+                val action =
+                    HomeFragmentDirections.actionHomeFragmentToSearchFragment(p0.toString())
                 findNavController().navigate(action)
-//                findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
                 return false
             }
 
             override fun onQueryTextChange(p0: String?): Boolean {
-//                findNavController().navigate(R.id.action_homeFragment_to_searchFragment)
                 return false
             }
 
         })
 
-        showRecyclerList()
+        showRecyclerList_carousel()
 
-        scrollTask()
+        showRecylerview_favorite()
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        uid = FirebaseAuth.getInstance().currentUser!!.uid
         if (container.contains("USERNAME")) {
-            loadDataLocal()
+            val sharedPreferences =
+                (activity?.getSharedPreferences("dataUser", Context.MODE_PRIVATE) ?: null)!!
+            var nama = sharedPreferences.getString("USERNAME", "USER")
+            if (nama != null || nama != "Null") {
+                loadDataLocal()
+            } else {
+                readUserData(uid)
+            }
         } else {
             readUserData(uid)
         }
@@ -136,49 +116,48 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
 
     private fun readUserData(uid: String) {
         user_name_google = FirebaseAuth.getInstance().currentUser!!.displayName.toString()
-        user_name_google =
-            if (user_name_google.length == 1) user_name_google else user_name_google.split(" ")[0]
-        Log.d("reading firebase", "nama user dari firebase $user_name_google")
-        if (user_name_google != "") {
+        Log.d("reading google auth", "nama user dari firebase $user_name_google")
+        if (user_name_google != "null") {
+            user_name_google = user_name_google.split(" ")[0]
 
-            binding.tvSalute.setText(
-                Html.fromHtml(
+            binding.tvSalute.text = Html.fromHtml(
+                "<font color=${Color.parseColor("#444941")}>Halo </font>" +
+                        "<font color=${Color.parseColor("#5F7A61")}> ${
+                            capitalize(
+                                user_name_google
+                            )
+                        }</font>"
+            )
+            saveData(user_name_google)
+        } else {
+            readUserDataFromFirestore(uid)
+        }
+    }
+
+    fun readUserDataFromFirestore(uid: String) {
+        db = FirebaseFirestore.getInstance().collection("Users").document(uid)
+        db.get().addOnSuccessListener {
+            val name = it.data?.getValue("nama").toString().split(" ")[0]
+            Log.d("reading firebase", "id user dari firebase $uid")
+            if (name.equals("") || name.equals(null)) {
+                binding.tvSalute.text = "User"
+            } else {
+                var nama_user = name
+                binding.tvSalute.text = Html.fromHtml(
                     "<font color=${Color.parseColor("#444941")}>Halo </font>" +
                             "<font color=${Color.parseColor("#5F7A61")}> ${
                                 capitalize(
-                                    user_name_google
+                                    nama_user
                                 )
                             }</font>"
                 )
-            )
-        } else {
-            db = FirebaseFirestore.getInstance().collection("Users").document(uid)
-            db.get().addOnSuccessListener {
-                val name = it.data?.getValue("nama").toString()
-
-                if (name.equals("") || name.equals(null)) {
-                    binding.tvSalute.setText("User")
-                } else {
-                    var nama_user = it.data?.getValue("nama").toString()
-                    binding.tvSalute.setText(
-                        Html.fromHtml(
-                            "<font color=${Color.parseColor("#444941")}>Halo </font>" +
-                                    "<font color=${Color.parseColor("#5F7A61")}> ${
-                                        capitalize(
-                                            nama_user
-                                        )
-                                    }</font>"
-                        )
-                    )
-                }
-
             }
+            saveData(name)
         }
-        saveData()
+
     }
 
-    private fun saveData() {
-        val nama = binding.tvSalute.text.toString().split(" ")[1]
+    private fun saveData(nama: String = "User!") {
         Log.d("Saving data", "Nama adalah : $nama")
         val sharedPreferences =
             (activity?.getSharedPreferences("dataUser", Context.MODE_PRIVATE))
@@ -186,19 +165,17 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
         editor?.apply {
             putString("USERNAME", nama)
         }?.apply()
-
     }
 
     private fun loadDataLocal() {
         val sharedPreferences =
             (activity?.getSharedPreferences("dataUser", Context.MODE_PRIVATE) ?: null)!!
         var nama = sharedPreferences.getString("USERNAME", "USER")
+        Log.d("SharedPreference Load ", "nama yang ada $nama")
         binding.tvSalute.text = sharedPreferences.getString("USERNAME", "USER")
-        binding.tvSalute.setText(
-            Html.fromHtml(
-                "<font color=${Color.parseColor("#444941")}>Halo </font>" +
-                        "<font color=${Color.parseColor("#5F7A61")}> ${capitalize(nama)}</font>"
-            )
+        binding.tvSalute.text = Html.fromHtml(
+            "<font color=${Color.parseColor("#444941")}>Halo </font>" +
+                    "<font color=${Color.parseColor("#5F7A61")}> ${capitalize(nama)}</font>"
         )
     }
 
@@ -206,83 +183,73 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
         when (v?.id) {
             R.id.btn_logout -> {
                 fAuth.signOut()
+                val SharedPreferences = activity?.getSharedPreferences("dataUser", Context.MODE_PRIVATE)
+                SharedPreferences?.edit()?.clear()?.commit()
                 startActivity(Intent(this.context, AuthenticationActivity::class.java))
             }
         }
     }
 
-    private fun showRecyclerList() {
+    private fun showRecyclerList_carousel() {
         carousel_layout_manager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         rvCarousel.layoutManager = carousel_layout_manager
-
-        // Ini buat looping layout manager sehingga item akan infinite scrolling, tapi kalo cek visible child ga bisa
-        //        carousel_layout_manager2 =
-//            context?.let {
-//                LoopingLayoutManager(
-//                    it, LoopingLayoutManager.HORIZONTAL,  false                           // Pass whether the views are laid out in reverse.
-//                    // False by default.
-//                )
-//            }!!
-//        rvCarousel.layoutManager = carousel_layout_manager2
-
 
         listCarouselAdapter = CarouselAdapter(list_carousel, this)
         rvCarousel.adapter = listCarouselAdapter
 
         listCarouselAdapter.setOnItemClickCallback(object : CarouselAdapter.OnItemClickCallback {
             override fun onItemClicked(data: Carousel) {
-//                showSelectedHero(data)
+
             }
         })
     }
 
-    private val llm: LinearLayoutManager =
-        object : LinearLayoutManager(context, HORIZONTAL, false) {
-            override fun smoothScrollToPosition(
-                recyclerView: RecyclerView,
-                state: RecyclerView.State,
-                position: Int
-            ) {
-                val scroller: LinearSmoothScroller =
-                    object : LinearSmoothScroller(context) {
-                        override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics): Float {
-                            return 2000f
-                        }
-                    }
-                scroller.targetPosition = position
-                startSmoothScroll(scroller)
-            }
-        }
+    private fun showRecylerview_favorite() {
 
-    override fun ToSearch(kategori: String) {
-        super.ToSearch(kategori)
-        // TODO TAMBAHKAN INTENT KE SEARCH FRAGMENT ??
-//        val intent = Intent(context, DetailActivity::class.java)
-//        intent.putExtra(DetailActivity.idDestinasi, idDestinasi)
-//        startActivity(intent)
+        list_favorite.clear()
+        FirebaseFirestore.getInstance()
+            .collection("Users")
+            .document(uid)
+            .collection("favorites")
+            .addSnapshotListener { data, error ->
+                if (error != null) {
+                    Log.e("Firestore Error", error.message.toString())
+                    return@addSnapshotListener
+                }
+                for (dc: DocumentChange in data?.documentChanges!!) {
+
+                    if (dc.type == DocumentChange.Type.ADDED) {
+                        list_favorite.add(dc.document.toObject(Favorite::class.java))
+                    }
+                }
+                favoriteAdapter.notifyDataSetChanged()
+                println("Banyak data di array list : ${list_favorite.size}")
+
+            }
+        binding.rvFavoriteProduct.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        favoriteAdapter = FavoriteAdapter(list_favorite, this)
+        binding.rvFavoriteProduct.adapter = favoriteAdapter
+    }
+
+    override fun toDetail(idProduct: String) {
+        super.toDetail(idProduct)
+        val navigateInto = HomeFragmentDirections.actionHomeFragmentToDetailFragment(idProduct)
+        findNavController().navigate(navigateInto)
+    }
+
+    override fun ToSearch(idx_kategori: Int) {
+        super.ToSearch(idx_kategori)
+        val navigateInto = HomeFragmentDirections.actionHomeFragmentToSearchFragment("", idx_kategori)
+        findNavController().navigate(navigateInto)
     }
 
     fun capitalize(str: String?): String? {
         return str?.capitalize() ?: str
     }
 
-    fun scrollTask() {
-        Timer().schedule(object : TimerTask() {
-            override fun run() {
-                rvCarousel.post(Runnable() {
-                    fun run() {
-
-                        var nextView =
-                            ((carousel_layout_manager.findFirstVisibleItemPosition()) + 1) % listCarouselAdapter.itemCount
-                        Toast.makeText(context, "ni delay", Toast.LENGTH_SHORT).show()
-                        rvCarousel.smoothScrollToPosition(nextView);
-                    }
-                });
-            }
-        }, 2000)
-    }
 
 }
 

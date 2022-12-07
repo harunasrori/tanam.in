@@ -17,6 +17,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterFragment : Google(), View.OnClickListener  {
+
     private lateinit var binding: FragmentRegisterBinding
 
     private lateinit var fAuth: FirebaseAuth
@@ -25,6 +26,7 @@ class RegisterFragment : Google(), View.OnClickListener  {
     private lateinit var myRef: DocumentReference
 
     private var firebaseUserID: String = ""
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

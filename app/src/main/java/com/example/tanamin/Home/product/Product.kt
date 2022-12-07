@@ -8,4 +8,5 @@ data class Product(
     var link_tokopedia: String = "",
     var harga: String = "",
     var photo: String = "",
+    var favourite : Boolean = false
 )

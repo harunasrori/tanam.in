@@ -1,5 +1,6 @@
 package com.example.tanamin.Home.carousel
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +12,10 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.tanamin.R
 import java.util.ArrayList
 
-class CarouselAdapter internal constructor(private val listCarousel: ArrayList<Carousel>, mListener : IUKategori) :
+class CarouselAdapter internal constructor(
+    private val listCarousel: ArrayList<Carousel>,
+    mListener: IUKategori
+) :
     RecyclerView.Adapter<CarouselAdapter.CardViewViewHolder>() {
 
     private lateinit var onItemClickCallback: OnItemClickCallback
@@ -28,30 +32,24 @@ class CarouselAdapter internal constructor(private val listCarousel: ArrayList<C
 
     override fun onBindViewHolder(holder: CardViewViewHolder, position: Int) {
 
-//        holder.imgPhoto.setImageResource(
-//            when (position % noOfItems) {
-//                1 -> R.drawable.carousel_alat
-//                2 -> R.drawable.carousel_bahan
-//                else -> R.drawable.carousel_product
-//            }
-//        )
-
         val carousel = listCarousel[position]
+        holder.itemView.apply {
 
         Glide.with(holder.itemView.context)
             .load(carousel.photo)
             .apply(RequestOptions().override(1065, 492))
             .into(holder.imgPhoto)
-
-        holder.imgPhoto.setOnClickListener {
+        }.setOnClickListener { mView ->
+            Log.d("onClick ProductAdapter", "toDetail di panggil")
+            mListener.ToSearch(position)
             Toast.makeText(
                 holder.itemView.context,
                 "Kamu memilih " + listCarousel[holder.adapterPosition].kategori,
                 Toast.LENGTH_SHORT
             ).show()
+
         }
     }
-
 
 
     fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
@@ -73,6 +71,6 @@ class CarouselAdapter internal constructor(private val listCarousel: ArrayList<C
     }
 
     interface IUKategori {
-        fun ToSearch(kategori: String) {}
+        fun ToSearch(idx_kategori: Int) {}
     }
 }

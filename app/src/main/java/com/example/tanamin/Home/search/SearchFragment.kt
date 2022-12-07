@@ -11,13 +11,18 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tanamin.Home.detail.DetailFragmentArgs
 import com.example.tanamin.Home.product.Product
 import com.example.tanamin.Home.product.ProductAdapter
 import com.example.tanamin.R
 import com.example.tanamin.databinding.FragmentSearchBinding
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,6 +33,8 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
 class SearchFragment : Fragment(), ProductAdapter.IUProduct {
+
+    val args: SearchFragmentArgs by navArgs()
 
     private lateinit var binding: FragmentSearchBinding
 
@@ -45,12 +52,16 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
     private lateinit var db: DocumentReference
     private var uid: String = ""
 
+    lateinit var tabLayout: TabLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         productSearchEngine = ProductSearchEngine(requireContext())
 
+
         ProductAdapter = ProductAdapter(ProductArrayList, this)
+
 
     }
 
@@ -59,6 +70,21 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
+
+        tabLayout = binding.tabsFilter
+        tabLayout.addTab(tabLayout.newTab().setText("semua"))
+        tabLayout.addTab(tabLayout.newTab().setText("alat"))
+        tabLayout.addTab(tabLayout.newTab().setText("bahan"))
+        tabLayout.addTab(tabLayout.newTab().setText("hasil"))
+        tabLayout.tabGravity = TabLayout.GRAVITY_CENTER
+        tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                loadProduct(tab.text.toString().toLowerCase())
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {}
+            override fun onTabReselected(tab: TabLayout.Tab) {}
+        })
 
         val searchTextObservable = createButtonClickObservable()
             .toFlowable(BackpressureStrategy.LATEST) // 1
@@ -71,14 +97,17 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 hideProgress()
-                val imm = ContextCompat.getSystemService(requireView().context, InputMethodManager::class.java)
+                val imm = ContextCompat.getSystemService(
+                    requireView().context,
+                    InputMethodManager::class.java
+                )
                 imm?.hideSoftInputFromWindow(requireView().windowToken, 0)
                 binding.SearchView.clearFocus()
                 showResult(it)
 
-
 //                binding.SearchView.onActionViewCollapsed()
             }
+
         rvProduct = binding.rvProduct
         rvProduct.setHasFixedSize(true)
 
@@ -88,13 +117,34 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
 
         return binding.root
     }
+
     fun View.hideKeyboard() {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(windowToken, 0)
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loadProduct()
+        when(args.idxKategori){
+            0 -> {
+                loadProduct()
+            }
+//            1 ->{
+//                loadProduct("alat")
+//            }
+//            2 ->{
+//                loadProduct("bahan")
+//            }
+//            3 ->{
+//                loadProduct("hasil")
+//            }
+//            else -> {
+//                loadProduct()
+//            }
+        }
+        val tab = tabLayout.getTabAt(args.idxKategori)
+        tab!!.select()
+
     }
 
     @Override
@@ -106,23 +156,42 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
         }
     }
 
-    fun loadProduct() {
-
+    fun loadProduct(kategori: String = "semua") {
+        ProductArrayList.clear()
         rfbaseProduct = FirebaseFirestore.getInstance()
-        rfbaseProduct.collection("product").addSnapshotListener { data, error ->
-            if (error != null) {
-                Log.e("Firestore Error", error.message.toString())
-                return@addSnapshotListener
-            }
-
-            for (dc: DocumentChange in data?.documentChanges!!) {
-
-                if (dc.type == DocumentChange.Type.ADDED) {
-
-                    ProductArrayList.add(dc.document.toObject(Product::class.java))
+        if (kategori == "semua") {
+            rfbaseProduct.collection("product").addSnapshotListener { data, error ->
+                if (error != null) {
+                    Log.e("Firestore Error", error.message.toString())
+                    return@addSnapshotListener
                 }
+
+                for (dc: DocumentChange in data?.documentChanges!!) {
+
+                    if (dc.type == DocumentChange.Type.ADDED) {
+
+                        ProductArrayList.add(dc.document.toObject(Product::class.java))
+                    }
+                }
+                ProductAdapter.notifyDataSetChanged()
             }
-            ProductAdapter.notifyDataSetChanged()
+        } else {
+            rfbaseProduct.collection("product").whereEqualTo("kategori", kategori)
+                .addSnapshotListener { data, error ->
+                    if (error != null) {
+                        Log.e("Firestore Error", error.message.toString())
+                        return@addSnapshotListener
+                    }
+
+                    for (dc: DocumentChange in data?.documentChanges!!) {
+
+                        if (dc.type == DocumentChange.Type.ADDED) {
+
+                            ProductArrayList.add(dc.document.toObject(Product::class.java))
+                        }
+                    }
+                    ProductAdapter.notifyDataSetChanged()
+                }
         }
 
         rvProduct.layoutManager = GridLayoutManager(context, 2)
@@ -131,9 +200,9 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
         ProductAdapter.setOnItemClickCallback(object : ProductAdapter.OnItemClickCallback {
             override fun onItemClicked(data: Product) {
                 showSelectedProduct(data)
+                toDetail(data.pid)
             }
         })
-
     }
 
     private fun showSelectedProduct(product: Product) {
@@ -173,8 +242,8 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
         if (result.isEmpty()) {
             Toast.makeText(context, "Tidak Ditemukan Hasil", Toast.LENGTH_SHORT).show()
         }
-
         ProductAdapter.products = result
+        ProductAdapter.notifyDataSetChanged()
     }
 
     private fun showProgress() {

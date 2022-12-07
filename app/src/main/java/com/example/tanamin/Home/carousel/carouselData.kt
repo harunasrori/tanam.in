@@ -5,15 +5,17 @@ import com.example.tanamin.R
 object carouselData {
 
     private val kategori = arrayOf(
+        "semua",
         "alat",
         "bahan",
-        "product"
+        "hasil"
     )
 
     private val carouselImages = intArrayOf(
+        R.drawable.carousel_product_default,
         R.drawable.carousel_alat,
         R.drawable.carousel_bahan,
-        R.drawable.carousel_product
+        R.drawable.carousel_hasil
     )
 
     val listData: ArrayList<Carousel>

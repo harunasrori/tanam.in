@@ -49,6 +49,7 @@
             android:layout_marginEnd="20dp"
             android:background="@drawable/round_corner_searchview"
             android:iconifiedByDefault="false"
+            android:nestedScrollingEnabled="false"
             android:queryBackground="@android:color/transparent"
             android:queryHint="Cari"
             app:layout_constraintEnd_toEndOf="parent"
@@ -68,6 +69,58 @@
             app:layout_constraintStart_toStartOf="@id/SearchView"
             app:layout_constraintTop_toBottomOf="@id/SearchView"
             tools:ignore="SpeakableTextPresentCheck" />
+
+        <HorizontalScrollView
+            android:layout_width="320dp"
+            android:layout_height="48dp"
+            android:scrollbars="none"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_filter"
+            app:layout_constraintEnd_toEndOf="@+id/SearchView"
+            app:layout_constraintStart_toEndOf="@id/btn_filter"
+            app:layout_constraintTop_toTopOf="@+id/btn_filter">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabs_filter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabBackground="@drawable/tabdefault"
+                app:tabIndicator="@drawable/tabselected"
+                app:tabIndicatorAnimationMode="elastic"
+                app:tabIndicatorGravity="stretch"
+                app:tabMaxWidth="140dp"
+                app:tabMinWidth="90dp"
+                app:tabMode="scrollable"
+                app:tabPaddingEnd="10dp"
+                app:tabSelectedTextColor="@color/white"
+                app:tabTextColor="#7D7F80">
+
+<!--                <com.google.android.material.tabs.TabItem-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginRight="15dp"-->
+<!--                    android:text="Semua" />-->
+
+<!--                <com.google.android.material.tabs.TabItem-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginEnd="15dp"-->
+<!--                    android:text="Alat" />-->
+
+<!--                <com.google.android.material.tabs.TabItem-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginEnd="15dp"-->
+<!--                    android:text="Bahan" />-->
+
+<!--                <com.google.android.material.tabs.TabItem-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginEnd="15dp"-->
+<!--                    android:text="Hasil" />-->
+
+            </com.google.android.material.tabs.TabLayout>
+
+        </HorizontalScrollView>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_product"
@@ -90,7 +143,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_filter"/>
+            app:layout_constraintTop_toBottomOf="@id/btn_filter" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

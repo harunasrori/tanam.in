@@ -42,7 +42,6 @@ class SplashScreenActivity : AppCompatActivity() {
                 val intent = Intent(this@SplashScreenActivity, AuthenticationActivity::class.java)
                 startActivity(intent)
             }
-//            startActivity(Intent(applicationContext, StoryActivity::class.java))
         }, 3000)
     }
 }
