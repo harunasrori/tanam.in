@@ -21,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class DetailFragment : Fragment(), View.OnClickListener {
@@ -47,8 +46,6 @@ class DetailFragment : Fragment(), View.OnClickListener {
         rfbaseProduct = FirebaseFirestore.getInstance()
 
         uid = FirebaseAuth.getInstance().currentUser!!.uid
-
-
 
         FirebaseFirestore.getInstance()
             .collection("product")
@@ -76,26 +73,6 @@ class DetailFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDetailBinding.inflate(inflater, container, false)
-
-//        val viewModel: DetailFragmentViewModel =
-//            ViewModelProvider(this).get(DetailFragmentViewModel::class.java)
-//
-//        var productData = viewModel.productData
-//        viewModel.getProductData(args.pid)
-//
-//
-//        Log.d("DetailFragment", "data : ${viewModel.nama_product}")
-//        binding.tvNamaProduk.text = productData.nama_product
-//        val harga = productData.harga
-//        binding.tvHargaProduk.text = "Rp. $harga"
-//        binding.tvDeskripsi.text = productData.deskripsi
-//            ?.replace("\\n", "\n")
-//            ?.replace("\t", "\t\t\t")
-//        Glide.with(this)
-//            .load(productData.photo)
-//            .apply(RequestOptions())
-//            .into(binding.imgItemPhoto)
-//        tokopedia_url = productData.link_tokopedia.toString()
 
         checkFavorites()
         binding.btnBack.setOnClickListener(this)

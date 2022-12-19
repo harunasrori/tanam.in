@@ -30,7 +30,8 @@
             app:destination="@id/detailFragment" />
         <argument
             android:name="query_to_search"
-            app:argType="string" />
+            app:argType="string"
+            android:defaultValue=" " />
         <argument
             android:name="idx_kategori"
             app:argType="integer"

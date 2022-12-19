@@ -62,7 +62,6 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
 
         ProductAdapter = ProductAdapter(ProductArrayList, this)
 
-
     }
 
     override fun onCreateView(
@@ -97,11 +96,13 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 hideProgress()
+                // tutup keyboard
                 val imm = ContextCompat.getSystemService(
                     requireView().context,
                     InputMethodManager::class.java
                 )
                 imm?.hideSoftInputFromWindow(requireView().windowToken, 0)
+                //
                 binding.SearchView.clearFocus()
                 showResult(it)
 
@@ -129,18 +130,6 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
             0 -> {
                 loadProduct()
             }
-//            1 ->{
-//                loadProduct("alat")
-//            }
-//            2 ->{
-//                loadProduct("bahan")
-//            }
-//            3 ->{
-//                loadProduct("hasil")
-//            }
-//            else -> {
-//                loadProduct()
-//            }
         }
         val tab = tabLayout.getTabAt(args.idxKategori)
         tab!!.select()
