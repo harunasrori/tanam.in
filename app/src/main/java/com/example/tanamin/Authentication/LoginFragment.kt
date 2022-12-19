@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
-import com.example.tanamin.Home.HomeActivity
+import com.example.tanamin.UI.home.HomeActivity
 import com.example.tanamin.R
 import com.example.tanamin.databinding.FragmentLoginBinding
 import com.example.tanamin.lib.Google

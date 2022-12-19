@@ -1,6 +1,7 @@
-package com.example.tanamin.Home.carousel
+package com.example.tanamin.UI.home.carousel
 
 import com.example.tanamin.R
+import com.example.tanamin.model.Carousel
 
 object carouselData {
 

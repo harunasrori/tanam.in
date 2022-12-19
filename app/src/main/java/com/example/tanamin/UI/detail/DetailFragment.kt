@@ -1,4 +1,4 @@
-package com.example.tanamin.Home.detail
+package com.example.tanamin.UI.detail
 
 import android.content.Intent
 import android.net.Uri
@@ -9,12 +9,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.example.tanamin.Home.product.Product
+import com.example.tanamin.model.Product
 import com.example.tanamin.R
 import com.example.tanamin.databinding.FragmentDetailBinding
 import com.google.firebase.auth.FirebaseAuth

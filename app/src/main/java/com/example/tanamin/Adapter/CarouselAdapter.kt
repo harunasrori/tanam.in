@@ -1,4 +1,4 @@
-package com.example.tanamin.Home.carousel
+package com.example.tanamin.Adapter
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -6,14 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.tanamin.R
+import com.example.tanamin.model.Carousel
 import java.util.ArrayList
 
 class CarouselAdapter internal constructor(
-    private val listCarousel: ArrayList<Carousel>,
+    private val listCarousel: LiveData<List<Carousel>>,
     mListener: IUKategori
 ) :
     RecyclerView.Adapter<CarouselAdapter.CardViewViewHolder>() {
@@ -32,21 +34,22 @@ class CarouselAdapter internal constructor(
 
     override fun onBindViewHolder(holder: CardViewViewHolder, position: Int) {
 
-        val carousel = listCarousel[position]
+//        val carousel = listCarousel[position]
+        val carousel = listCarousel.value?.get(position)
         holder.itemView.apply {
 
         Glide.with(holder.itemView.context)
-            .load(carousel.photo)
+            .load(carousel?.photo)
             .apply(RequestOptions().override(1065, 492))
             .into(holder.imgPhoto)
         }.setOnClickListener { mView ->
             Log.d("onClick ProductAdapter", "toDetail di panggil")
             mListener.ToSearch(position)
-            Toast.makeText(
-                holder.itemView.context,
-                "Kamu memilih " + listCarousel[holder.adapterPosition].kategori,
-                Toast.LENGTH_SHORT
-            ).show()
+//            Toast.makeText(
+//                holder.itemView.context,
+//                "Kamu memilih " + listCarousel[listCarousel.value?.get(holder.adapterPosition)].kategori,
+//                Toast.LENGTH_SHORT
+//            ).show()
 
         }
     }
@@ -58,7 +61,7 @@ class CarouselAdapter internal constructor(
 
     override fun getItemCount(): Int {
 //        return Integer.MAX_VALUE;
-        return listCarousel.size
+        return listCarousel.value?.size ?: 0
     }
 
 

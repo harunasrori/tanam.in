@@ -1,4 +1,4 @@
-package com.example.tanamin.Home
+package com.example.tanamin.UI.home
 
 import android.content.Context
 import android.content.Intent
@@ -6,25 +6,24 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Html
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tanamin.Authentication.AuthenticationActivity
-import com.example.tanamin.Home.carousel.Carousel
-import com.example.tanamin.Home.carousel.CarouselAdapter
-import com.example.tanamin.Home.carousel.carouselData
-import com.example.tanamin.Home.favorite.Favorite
-import com.example.tanamin.Home.favorite.FavoriteAdapter
+import com.example.tanamin.model.Carousel
+import com.example.tanamin.Adapter.CarouselAdapter
+import com.example.tanamin.UI.home.carousel.carouselData
+import com.example.tanamin.model.Favorite
+import com.example.tanamin.Adapter.FavoriteAdapter
 import com.example.tanamin.R
+import com.example.tanamin.UI.home.carousel.CarouselViewModel
 import com.example.tanamin.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
@@ -38,15 +37,13 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
 
     private lateinit var fAuth: FirebaseAuth
 
-//    private lateinit var productViewModel: ProductViewModel
+    private lateinit var carouselViewModel: CarouselViewModel
 
     private lateinit var binding: FragmentHomeBinding
     private lateinit var carousel_layout_manager: LinearLayoutManager
 
-    //    private lateinit var carousel_layout_manager2: LoopingLayoutManager
     private lateinit var db: DocumentReference
 
-    private var list_carousel: ArrayList<Carousel> = arrayListOf<Carousel>()
     private var list_favorite: ArrayList<Favorite> = arrayListOf<Favorite>()
     private lateinit var rvCarousel: RecyclerView
     private lateinit var listCarouselAdapter: CarouselAdapter
@@ -58,9 +55,11 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        carouselViewModel = ViewModelProvider(this)[CarouselViewModel::class.java]
+
         container = requireActivity().getSharedPreferences("dataUser", Context.MODE_PRIVATE)
         uid = FirebaseAuth.getInstance().currentUser!!.uid
-        list_carousel.addAll(carouselData.listData)
+
     }
 
 
@@ -196,7 +195,7 @@ class HomeFragment : Fragment(), View.OnClickListener, CarouselAdapter.IUKategor
 
         rvCarousel.layoutManager = carousel_layout_manager
 
-        listCarouselAdapter = CarouselAdapter(list_carousel, this)
+        listCarouselAdapter = CarouselAdapter(carouselViewModel.fetchAllCarousel(), this)
         rvCarousel.adapter = listCarouselAdapter
 
         listCarouselAdapter.setOnItemClickCallback(object : CarouselAdapter.OnItemClickCallback {

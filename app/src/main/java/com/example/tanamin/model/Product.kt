@@ -1,4 +1,4 @@
-package com.example.tanamin.Home.product
+package com.example.tanamin.model
 
 data class Product(
     var pid: String = "",

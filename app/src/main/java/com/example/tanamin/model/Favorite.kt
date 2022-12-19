@@ -1,4 +1,4 @@
-package com.example.tanamin.Home.favorite
+package com.example.tanamin.model
 
 data class Favorite (
     var pid: String? = "",

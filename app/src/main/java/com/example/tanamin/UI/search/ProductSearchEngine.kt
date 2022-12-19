@@ -1,11 +1,8 @@
-package com.example.tanamin.Home.search
+package com.example.tanamin.UI.search
 
 import android.content.Context
 import android.util.Log
-import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.Glide.init
-import com.example.tanamin.Home.product.Product
-import com.example.tanamin.Home.product.ProductAdapter
+import com.example.tanamin.model.Product
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 

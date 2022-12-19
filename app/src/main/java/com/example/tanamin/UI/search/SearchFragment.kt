@@ -1,4 +1,4 @@
-package com.example.tanamin.Home.search
+package com.example.tanamin.UI.search
 
 import android.content.Context
 import android.os.Bundle
@@ -11,14 +11,12 @@ import android.widget.SearchView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tanamin.Home.detail.DetailFragmentArgs
-import com.example.tanamin.Home.product.Product
-import com.example.tanamin.Home.product.ProductAdapter
+import com.example.tanamin.model.Product
+import com.example.tanamin.Adapter.ProductAdapter
 import com.example.tanamin.R
 import com.example.tanamin.databinding.FragmentSearchBinding
 import com.google.android.material.tabs.TabLayout
@@ -48,9 +46,6 @@ class SearchFragment : Fragment(), ProductAdapter.IUProduct {
     protected lateinit var productSearchEngine: ProductSearchEngine
 
     private lateinit var disposable: Disposable
-
-    private lateinit var db: DocumentReference
-    private var uid: String = ""
 
     lateinit var tabLayout: TabLayout
 

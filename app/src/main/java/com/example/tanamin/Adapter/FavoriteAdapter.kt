@@ -1,4 +1,4 @@
-package com.example.tanamin.Home.favorite
+package com.example.tanamin.Adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.tanamin.R
+import com.example.tanamin.model.Favorite
 
 class FavoriteAdapter(private val listFavorite: ArrayList<Favorite>, mListener : IUProduct) :
     RecyclerView.Adapter<FavoriteAdapter.ListViewHolder>() {

@@ -6,8 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.WindowManager
 import com.example.tanamin.Authentication.AuthenticationActivity
-import com.example.tanamin.Home.HomeActivity
-import com.example.tanamin.R
+import com.example.tanamin.UI.home.HomeActivity
 import com.example.tanamin.databinding.ActivitySplashScreenBinding
 import com.google.firebase.auth.FirebaseAuth
 
